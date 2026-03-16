@@ -1,6 +1,6 @@
 # LeadOrigin
 
-Gem Ruby interna da Neurologic AI para identificar o canal de aquisição de um lead a partir de uma URL e seus parâmetros.
+Gem Ruby interna da Leadster para identificar o canal de aquisição de um lead a partir de uma URL e seus parâmetros.
 
 ## Sumário
 
