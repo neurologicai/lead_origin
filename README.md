@@ -40,7 +40,7 @@ gem "lead_origin", git: "https://github.com/neurologicai/lead_origin"
 A interface pública é o método `LeadOrigin.detect`, que recebe a URL da página onde o lead foi capturado e, opcionalmente, o cabeçalho HTTP Referer.
 
 ```ruby
-LeadOrigin.detect(url:, referrer: nil) # => Symbol
+LeadOrigin.detect(url:, referrer: nil) # => Symbol ou nil
 ```
 
 ### Exemplos
@@ -177,12 +177,12 @@ Quando nenhuma das regras anteriores produz resultado, o canal retornado é `:di
 
 ### URL inválida ou ausente
 
-URLs `nil`, vazias ou malformadas são tratadas de forma segura: os parâmetros são considerados inexistentes e a detecção continua nas etapas seguintes (referrer e direct).
+URLs `nil`, vazias ou malformadas retornam `nil` imediatamente, sem prosseguir para as etapas seguintes (referrer e direct).
 
 ```ruby
-LeadOrigin.detect(url: nil)             # => :direct
-LeadOrigin.detect(url: "")              # => :direct
-LeadOrigin.detect(url: "nao_é_uma_url") # => :direct (sem crash)
+LeadOrigin.detect(url: nil)             # => nil
+LeadOrigin.detect(url: "")              # => nil
+LeadOrigin.detect(url: "nao_é_uma_url") # => nil (sem crash)
 ```
 
 ### Referrer em branco
