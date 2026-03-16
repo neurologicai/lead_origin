@@ -28,8 +28,7 @@ module LeadOrigin
 
       detect_from_click_id ||
         detect_from_utm ||
-        detect_from_referrer ||
-        :direct
+        detect_from_referrer
     end
 
     private
@@ -52,17 +51,18 @@ module LeadOrigin
 
     def detect_from_utm
       source = @params["utm_source"]
-      return nil unless source
+      return nil if source.blank?
 
       UTM_SOURCE_PATTERNS.each do |pattern, channel|
         return channel if source.match?(pattern)
       end
 
-      :other
+      nil
     end
 
     def detect_from_referrer
-      :organic if @referrer && !@referrer.strip.empty?
+      return nil if @referrer.blank? || @referrer.strip.empty?
+      :organic
     end
   end
 end

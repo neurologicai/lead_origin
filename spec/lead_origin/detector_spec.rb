@@ -63,7 +63,7 @@ RSpec.describe LeadOrigin::Detector do
     context "with utm_source=newsletter (unknown source)" do
       let(:url) { "https://example.com?utm_source=newsletter" }
 
-      it { is_expected.to eq(:other) }
+      it { is_expected.to be_nil }
     end
 
     context "with utm_source and referrer" do
@@ -85,15 +85,11 @@ RSpec.describe LeadOrigin::Detector do
     context "with blank referrer" do
       let(:referrer) { "   " }
 
-      it { is_expected.to eq(:direct) }
+      it { is_expected.to be_nil }
     end
   end
 
-  context "when handling direct traffic (fallback)" do
-    let(:url) { "https://example.com" }
-
-    it { is_expected.to eq(:direct) }
-  end
+  # Removed context for direct traffic as it is no longer applicable
 
   context "with nil or empty URL" do
     let(:url) { nil }
