@@ -24,6 +24,8 @@ module LeadOrigin
     end
 
     def detect
+      return nil if @params.nil?
+
       detect_from_click_id ||
         detect_from_utm ||
         detect_from_referrer ||
@@ -33,12 +35,12 @@ module LeadOrigin
     private
 
     def parse_params(url)
-      return {} if url.blank?
+      return nil if url.blank?
 
       query = URI.parse(url).query
       query ? CGI.parse(query).transform_values(&:first) : {}
     rescue URI::InvalidURIError
-      {}
+      nil
     end
 
     def detect_from_click_id
