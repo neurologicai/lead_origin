@@ -98,12 +98,18 @@ RSpec.describe LeadOrigin::Detector do
   context "with nil or empty URL" do
     let(:url) { nil }
 
-    it { is_expected.to eq(:direct) }
+    it { is_expected.to be_nil }
 
     context "when the string is empty" do
       let(:url) { "" }
 
-      it { is_expected.to eq(:direct) }
+      it { is_expected.to be_nil }
+    end
+
+    context "when the URL is malformed" do
+      let(:url) { "nao_é_uma_url" }
+
+      it { is_expected.to be_nil }
     end
   end
 end
