@@ -6,6 +6,7 @@ RSpec.describe LeadOrigin::Detector do
   subject(:detect) { described_class.new(url: url, referrer: referrer).detect }
 
   let(:referrer) { nil }
+  let(:url) { location }
 
   context "when detecting click ID (highest priority)" do
     context "with fbclid" do
@@ -66,6 +67,65 @@ RSpec.describe LeadOrigin::Detector do
       it { is_expected.to be_nil }
     end
 
+    context "when location is nil" do
+      let(:url) { nil }
+      let(:referrer) { "https://www.google.com/search?q=test" }
+
+      it "falls back to referrer for organic detection" do
+        expect(subject).to eq(:organic)
+      end
+    end
+
+    context "when both location and referrer are nil" do
+      let(:url) { nil }
+      let(:referrer) { nil }
+
+      it "sets analytic_channel to nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "when referrer matches bing" do
+      let(:url) { nil }
+      let(:referrer) { "https://www.bing.com/search?q=test" }
+
+      it { is_expected.to eq(:organic) }
+    end
+
+    context "when referrer matches br.yahoo" do
+      let(:url) { nil }
+      let(:referrer) { "https://br.yahoo.com/search?q=test" }
+
+      it { is_expected.to eq(:organic) }
+    end
+
+    context "when location has no tracking params and referrer is same domain with fbclid=" do
+      let(:url) { "https://example.com/page" }
+      let(:referrer) { "https://example.com/?fbclid=abc123" }
+
+      it "uses referrer to detect channel" do
+        expect(subject).to eq(:facebook)
+      end
+    end
+
+    context "when location has utm_ params and referrer is same domain with fbclid=" do
+      let(:url) { "https://example.com/?utm_source=email" }
+      let(:referrer) { "https://example.com/?fbclid=abc123" }
+
+      it "ignores referrer and uses location" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "when location has no tracking params and referrer is different domain with fbclid=" do
+      let(:url) { "https://example.com/page" }
+      let(:referrer) { "https://otherdomain.com/?fbclid=abc123" }
+
+      it "ignores referrer and uses location" do
+        expect(subject).to be_nil
+      end
+    end
+
     context "with utm_source and referrer" do
       let(:url)      { "https://example.com?utm_source=google" }
       let(:referrer) { "https://some-site.com" }
@@ -77,7 +137,7 @@ RSpec.describe LeadOrigin::Detector do
   end
 
   context "when detecting referrer" do
-    let(:url)      { "https://example.com" }
+    let(:url) { "https://example.com" }
     let(:referrer) { "https://some-site.com" }
 
     it { is_expected.to eq(:organic) }
