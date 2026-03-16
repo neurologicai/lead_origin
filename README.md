@@ -70,7 +70,7 @@ LeadOrigin.detect(url: "https://site.com/landing?utm_source=linkedin")
 # => :linkedin
 
 LeadOrigin.detect(url: "https://site.com/landing?utm_source=newsletter")
-# => :other
+# => nil
 
 # Detectado via Referrer
 LeadOrigin.detect(url: "https://site.com/landing", referrer: "https://blog.parceiro.com")
@@ -78,7 +78,7 @@ LeadOrigin.detect(url: "https://site.com/landing", referrer: "https://blog.parce
 
 # Sem informações de origem
 LeadOrigin.detect(url: "https://site.com/landing")
-# => :direct
+# => nil
 ```
 
 ### Usando a classe diretamente
@@ -101,8 +101,7 @@ detector.detect
 | `:facebook` | Tráfego originado do Facebook/Meta (via fbclid ou utm_source)          |
 | `:linkedin` | Tráfego originado do LinkedIn (via li_fat_id ou utm_source)            |
 | `:organic`  | Tráfego com referrer presente, mas sem parâmetros de campanha          |
-| `:other`    | UTM source presente e reconhecido, mas não mapeado para canal conhecido |
-| `:direct`   | Nenhuma informação de origem disponível                                |
+
 
 ---
 
@@ -113,7 +112,7 @@ detector.detect
 A detecção segue uma cadeia de prioridade estrita. A primeira regra que produzir um resultado encerra a análise:
 
 ```
-Click ID  >  UTM source  >  Referrer  >  Direct
+Click ID  >  UTM source  >  Referrer
 ```
 
 ### 1. Click IDs (maior prioridade)
@@ -156,20 +155,18 @@ Quando não há click ID, o parâmetro `utm_source` é analisado por correspond�
 | `Facebook`         | `:facebook` |
 | `fb`               | `:facebook` |
 | `linkedin`         | `:linkedin` |
-| `newsletter`       | `:other`    |
-| `email`            | `:other`    |
-| `parceiro_xpto`    | `:other`    |
+| `newsletter`       | nil         |
+| `email`            | nil         |
+| `parceiro_xpto`    | nil         |
 
 ### 3. Referrer HTTP
 
 Quando não há click ID nem UTM source, o cabeçalho HTTP Referer é verificado.
 
 - **Referrer presente e não vazio** → `:organic`
-- **Referrer ausente, `nil` ou apenas espaços em branco** → passa para o próximo passo
+- **Referrer ausente, `nil` ou apenas espaços em branco** → retorna `nil`
 
-### 4. Direct (fallback)
 
-Quando nenhuma das regras anteriores produz resultado, o canal retornado é `:direct`, indicando que o lead chegou sem nenhuma informação de origem rastreável.
 
 ---
 
@@ -190,7 +187,7 @@ LeadOrigin.detect(url: "nao_é_uma_url") # => nil (sem crash)
 Strings de referrer compostas apenas por espaços são tratadas como ausentes.
 
 ```ruby
-LeadOrigin.detect(url: "https://site.com", referrer: "   ") # => :direct
+LeadOrigin.detect(url: "https://site.com", referrer: "   ") # => nil
 ```
 
 ### Click ID prevalece sobre UTM
