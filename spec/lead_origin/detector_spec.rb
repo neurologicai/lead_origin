@@ -140,6 +140,12 @@ RSpec.describe LeadOrigin::Detector do
     let(:url) { "https://example.com" }
     let(:referrer) { "https://some-site.com" }
 
+    context "when url and referrer are the same" do
+      let(:referrer) { "https://example.com" }
+
+      it { is_expected.to be_nil }
+    end
+
     it { is_expected.to eq(:organic) }
 
     context "with blank referrer" do
