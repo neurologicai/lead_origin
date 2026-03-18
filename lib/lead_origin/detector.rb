@@ -66,6 +66,7 @@ module LeadOrigin
 
     def detect_from_referrer
       return nil if @referrer.blank?
+      return nil if same_url?(@url, @referrer)
 
       referrer_params = parse_params(@referrer)
       return nil if referrer_params && has_tracking_params?(referrer_params)
@@ -92,6 +93,12 @@ module LeadOrigin
         return channel if params.key?(param)
       end
       nil
+    end
+
+    def same_url?(url1, url2)
+      return false if url1.blank? || url2.blank?
+
+      url1.strip == url2.strip
     end
 
     def same_domain?(url1, url2)
